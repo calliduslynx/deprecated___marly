@@ -1,0 +1,87 @@
+<html ng-app="MarlyApp">
+<head>
+  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.6/angular.min.js"></script>
+  <script src="index.js"></script>
+
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <link rel="stylesheet" href="index.css">
+</head>
+
+<body ng-controller="MainController as $ctrl">
+<div id="root">
+
+
+  <h1>
+    Welcome to Mar.ly
+  </h1>
+
+  <hr>
+
+  <div id="login">
+    <div ng-if="$ctrl.userdetails == null">
+      <div>You are not logged in.</div>
+      <a href="/login">Login with Google</a>
+    </div>
+    <div ng-if="$ctrl.userdetails != null">
+      <img ng-src="{{$ctrl.userdetails.imageurl}}" alt="image of you">
+      <div>Hello {{$ctrl.userdetails.name}}</div>
+    </div>
+  </div>
+
+  <div ng-if="$ctrl.userdetails != null">
+    <h2>Add new url</h2>
+    <div style="display: flex">
+      <input placeholder="put long url here" ng-model="$ctrl.newUrl">
+      <input type="button" value="make it tiny" ng-click="$ctrl.createNewMapping()">
+    </div>
+
+    <h2 ng-if="$ctrl.userdetails.isAdmin">Manage urls</h2>
+    <h2 ng-if="!$ctrl.userdetails.isAdmin">Manage your urls</h2>
+    <div style="display: flex">
+      <table class="table">
+        <thead>
+        <tr>
+          <td ng-if="$ctrl.userdetails.isAdmin">Owner</td>
+          <td>Short</td>
+          <td>Long</td>
+          <td>Clicks last hour</td>
+          <td>Clicks last 24 hours</td>
+          <td>Clicks last month</td>
+          <td>Clicks total</td>
+          <td>Delete</td>
+        </tr>
+        </thead>
+        <tbody>
+        <tr ng-repeat="mapping in $ctrl.mappingdetails">
+          <td ng-if="$ctrl.userdetails.isAdmin">
+            {{mapping.userEmail}}
+          </td>
+          <td>
+            <a href="{{mapping.shortUrl}}">{{mapping.shortUrl}}</a>
+          </td>
+          <td>
+            <a href="{{mapping.longUrl}}">{{mapping.longUrl}}</a>
+          </td>
+          <td>
+            {{mapping.lastHour}}
+          </td>
+          <td>
+            {{mapping.lastDay}}
+          </td>
+          <td>
+            {{mapping.lastMonth}}
+          </td>
+          <td>
+            {{mapping.total}}
+          </td>
+          <td>
+            <input type="button" value="X" ng-click="$ctrl.deleteMapping(mapping.shortUrl)">
+          </td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+</body>
+</html>

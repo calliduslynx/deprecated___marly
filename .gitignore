@@ -1,0 +1,7 @@
+marly-*/out
+marly-*/build
+marly-*/.gradle
+**/.DS_Store
+**/.idea
+.gradle
+**/*.iml

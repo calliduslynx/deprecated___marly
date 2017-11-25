@@ -1,0 +1,20 @@
+debug: true
+
+security:
+  oauth2:
+    client:
+      clientId: 606403288519-c2v9ppifj60765oeseod9vshr36k8tce.apps.googleusercontent.com
+      clientSecret: 9W_gel2KXBj9qRWRCvfwKdsD
+      accessTokenUri: https://www.googleapis.com/oauth2/v4/token
+      userAuthorizationUri: https://accounts.google.com/o/oauth2/v2/auth
+      clientAuthenticationScheme: form
+      scope:
+        - openid
+        - email
+        - profile
+    resource:
+      userInfoUri: https://www.googleapis.com/oauth2/v3/userinfo
+      preferTokenInfo: true
+      
+marly:
+  admin-users: marcel.berschneider.quicklohn@gmail.com
