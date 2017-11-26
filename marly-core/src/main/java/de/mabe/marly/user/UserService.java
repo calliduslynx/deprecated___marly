@@ -38,4 +38,8 @@ public class UserService {
       log.info("created user: " + email);
     }
   }
+
+  public User findByEmail(String email) {
+    return userRepo.findByEmail(email);
+  }
 }

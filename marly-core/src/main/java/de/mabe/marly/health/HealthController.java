@@ -5,8 +5,16 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class HealthController {
+  public static final class StatusInfo {
+    public final boolean active;
+
+    public StatusInfo(boolean active) {
+      this.active = active;
+    }
+  }
+
   @GetMapping("/info")
-  public String statusInfo() {
-    return "{ \"status\" : \"active\" }";
+  public StatusInfo statusInfo() {
+    return new StatusInfo(true);
   }
 }

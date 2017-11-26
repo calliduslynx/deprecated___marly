@@ -15,10 +15,10 @@ public class RedirectEventThrower {
     this.redirectEventUrl = redirectEventUrl;
   }
 
-  public void throwUrlCalledEvent(String shortUrl) {
+  public void throwUrlCalledEvent(String tiny) {
     executorService.submit(() -> {
       try {
-        Unirest.post(redirectEventUrl + "/" + shortUrl).asString();
+        Unirest.post(redirectEventUrl + "/" + tiny).asString();
       } catch (Exception e) {
         MarlyWorker.log.warn("Error sending redirectCalledEvent: " + e.getMessage());
       }

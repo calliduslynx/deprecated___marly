@@ -7,12 +7,12 @@ public class InfoFactory {
   /**
    * creates a nice json static info
    */
-  public String getInfoJson(boolean active, Date lastUpdate) {
+  public String getInfoJson(boolean active, int size, Date lastUpdate) {
     if (!active)
-      return "{ \"active\" : \"false\" }";
+      return "{ \"active\" : false }";
     else {
       String formattedDate = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'").format(lastUpdate);
-      return "{ \"active\" : \"true\", \"lastupdate\" : \"" + formattedDate + "\" }";
+      return "{ \"active\" : true, \"mappings\": " + size + ", \"lastupdate\" : \"" + formattedDate + "\" }";
     }
   }
 }

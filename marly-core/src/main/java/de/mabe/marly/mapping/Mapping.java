@@ -19,10 +19,10 @@ public class Mapping {
   private long id;
 
   @Column(unique = true, nullable = false)
-  private String shortUrl;
+  private String tiny;
 
   @Column(nullable = false)
-  private String longUrl;
+  private String url;
 
   @ManyToOne(optional = false)
   private User user;
@@ -31,18 +31,18 @@ public class Mapping {
     // hibernate
   }
 
-  public Mapping(String shortUrl, String longUrl, User user) {
-    this.shortUrl = shortUrl;
-    this.longUrl = longUrl;
+  public Mapping(String tiny, String url, User user) {
+    this.tiny = tiny;
+    this.url = url;
     this.user = user;
   }
 
-  public String getShortUrl() {
-    return shortUrl;
+  public String getTiny() {
+    return tiny;
   }
 
-  public String getLongUrl() {
-    return longUrl;
+  public String getUrl() {
+    return url;
   }
 
   public User getUser() {
@@ -51,14 +51,14 @@ public class Mapping {
 
   @Override
   public String toString() {
-    return shortUrl + " -> " + longUrl;
+    return tiny + " -> " + url;
   }
 
   // ******************************************************************************************************************
 
   @Repository
   public interface Repo extends JpaRepository<Mapping, Long> {
-    Mapping findByShortUrl(String shortUrl);
+    Mapping findByTiny(String tiny);
 
     List<Mapping> findByUser(User user);
   }

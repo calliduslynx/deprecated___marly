@@ -1,10 +1,10 @@
 package de.mabe.marly.mapping;
 
-import de.mabe.marly.security.WebSecurityConfig.OAuth2User;
+import de.mabe.marly.security.OAuth2User;
 import de.mabe.marly.user.User;
+import de.mabe.marly.user.UserService;
 import static java.util.stream.Collectors.toList;
 
-import java.security.Principal;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -20,22 +20,17 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class MappingController {
-  @Autowired private Mapping.Repo mappingRepo;
-  @Autowired private User.Repo userRepo;
+  @Autowired private UserService userService;
   @Autowired private MappingService mappingService;
 
   private static class MappingInfo {
-    public final String shortUrl, longUrl, userEmail;
-    public final int lastHour, lastDay, lastMonth, total;
+    public final String tiny, tinyUrl, url, userEmail;
 
-    public MappingInfo(String shortUrl, String longUrl, String userEmail, int lastHour, int lastDay, int lastMonth, int total) {
-      this.shortUrl = shortUrl;
-      this.longUrl = longUrl;
+    public MappingInfo(String tiny, String tinyUrl, String url, String userEmail) {
+      this.tiny = tiny;
+      this.tinyUrl = tinyUrl;
+      this.url = url;
       this.userEmail = userEmail;
-      this.lastHour = lastHour;
-      this.lastDay = lastDay;
-      this.lastMonth = lastMonth;
-      this.total = total;
     }
   }
 
@@ -44,24 +39,21 @@ public class MappingController {
    */
   @GetMapping("/mappings")
   public List<MappingInfo> getMappingsForUser(OAuth2User sessionUser) {
-
-    System.out.println(sessionUser);
-
     List<Mapping> mappings;
     if (sessionUser.isAdmin()) {
-      mappings = mappingRepo.findAll();
+      mappings = mappingService.findAll();
     } else {
-      User user = userRepo.findByEmail(sessionUser.getEmail());
+      User user = userService.findByEmail(sessionUser.getEmail());
       if (user == null) return Collections.emptyList();
-      mappings = mappingRepo.findByUser(user);
+      mappings = mappingService.findByUser(user);
     }
 
     return mappings.stream().map(mapping -> {
       return new MappingInfo(
-          mappingService.shortUrlPostfixToHref(mapping.getShortUrl()),
-          mapping.getLongUrl(),
-          mapping.getUser().getEmail(),
-          0, 0, 0, 0 // FIXME: load numbers
+          mapping.getTiny(),
+          mappingService.getTinyUrl(mapping.getTiny()),
+          mapping.getUrl(),
+          mapping.getUser().getEmail()
       );
     }).collect(toList());
   }
@@ -71,16 +63,16 @@ public class MappingController {
   }
 
   @PostMapping("/mappings")
-  public ResponseEntity<Void> createNewMapping(Principal principal, @RequestBody NewMappingModel model) {
-    String email = new OAuth2User(principal).getEmail();
+  public ResponseEntity<Void> createNewMapping(OAuth2User user, @RequestBody NewMappingModel model) {
+    String email = user.getEmail();
     mappingService.createNewMapping(email, model.url);
     return ResponseEntity.status(201).build();
   }
 
-  @DeleteMapping("/mappings/{shortUrl}")
-  public ResponseEntity<Void> deleteMapping(Principal principal, @RequestBody @PathVariable("shortUrl") String shortUrl) {
-    OAuth2User user = new OAuth2User(principal);
-    Mapping mapping = mappingService.getMappingByShortUrl(shortUrl);
+  @DeleteMapping("/mappings/{tiny}")
+  public ResponseEntity<Void> deleteMapping(OAuth2User user, @RequestBody @PathVariable("tiny") String tiny) {
+
+    Mapping mapping = mappingService.getMappingByTiny(tiny);
     if (mapping == null)
       return ResponseEntity.notFound().build();
     if (!user.isAdmin() && !user.getEmail().equals(mapping.getUser().getEmail()))
@@ -95,8 +87,8 @@ public class MappingController {
    */
   @GetMapping("/intern/mappings")
   public String getAllMappings() {
-    return mappingRepo.findAll().stream()
-        .map(mapping -> mapping.getShortUrl() + "<>" + mapping.getLongUrl())
+    return mappingService.findAll().stream()
+        .map(mapping -> mapping.getTiny() + "<>" + mapping.getUrl())
         .collect(Collectors.joining("><"));
   }
 }

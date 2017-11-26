@@ -1,57 +1,75 @@
 package de.mabe.marly.mapping;
 
+import de.mabe.marly.statistic.RedirectEvent;
 import de.mabe.marly.user.User;
+import de.mabe.marly.user.UserService;
 import nl.flotsam.xeger.Xeger;
+
+import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 @Service
 public class MappingService {
   private static final Logger log = Logger.getLogger(MappingService.class);
 
-  public static final String SHORT_URL_PATTERN = "[a-zA-Z0-9]{5}";
+  private final Xeger xeger;
 
-  private final Xeger xeger = new Xeger(SHORT_URL_PATTERN);
-
-  @Autowired private User.Repo userRepo;
+  @Autowired private UserService userService;
+  @Autowired private RedirectEvent.Repo eventRepo;
   @Autowired private Mapping.Repo mappingRepo;
 
-  public String shortUrlPostfixToHref(String postfix) {
-    return "http://localhost:9010/" + postfix;
+  private MappingService(@Value("${marly.tiny-pattern}") String tinyPattern) {
+    log.info("using tiny pattern: " + tinyPattern);
+    this.xeger = new Xeger(tinyPattern);
   }
 
-  public synchronized void createNewMapping(String email, String longUrl) {
-    User user = userRepo.findByEmail(email);
+  public String getTinyUrl(String tiny) {
+    return "http://localhost:9010/" + tiny;
+  }
+
+  public synchronized void createNewMapping(String email, String url) {
+    User user = userService.findByEmail(email);
     if (user == null) throw new IllegalStateException("user not found");
 
-    String shortUrl = createNewShortUrl();
+    String tiny = generateNewTiny();
 
-    Mapping mapping = new Mapping(shortUrl, longUrl, user);
+    Mapping mapping = new Mapping(tiny, url, user);
     mappingRepo.save(mapping);
 
     log.info("stored " + mapping);
   }
 
-  private String createNewShortUrl() {
+  private String generateNewTiny() {
     while (true) {
       String newShortUrl = xeger.generate();
 
       // checking if url already exists
-      Mapping mapping = mappingRepo.findByShortUrl(newShortUrl);
+      Mapping mapping = mappingRepo.findByTiny(newShortUrl);
       if (mapping == null)
         return newShortUrl;
     }
   }
 
 
-  public Mapping getMappingByShortUrl(String shortUrl) {
-    return mappingRepo.findByShortUrl(shortUrl);
+  public Mapping getMappingByTiny(String tiny) {
+    return mappingRepo.findByTiny(tiny);
   }
 
   public void deleteMapping(Mapping mapping) {
     log.info("deleting " + mapping);
+    eventRepo.delete(eventRepo.findByMapping(mapping));
     mappingRepo.delete(mapping);
+  }
+
+  public List<Mapping> findAll() {
+    return mappingRepo.findAll();
+  }
+
+  public List<Mapping> findByUser(User user) {
+    return mappingRepo.findByUser(user);
   }
 }

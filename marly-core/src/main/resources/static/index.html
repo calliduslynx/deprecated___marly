@@ -46,7 +46,7 @@
           <td>Long</td>
           <td>Clicks last hour</td>
           <td>Clicks last 24 hours</td>
-          <td>Clicks last month</td>
+          <td>Clicks 7 days</td>
           <td>Clicks total</td>
           <td>Delete</td>
         </tr>
@@ -57,25 +57,25 @@
             {{mapping.userEmail}}
           </td>
           <td>
-            <a href="{{mapping.shortUrl}}">{{mapping.shortUrl}}</a>
+            <a href="{{mapping.tinyUrl}}">{{mapping.tinyUrl}}</a>
           </td>
           <td>
-            <a href="{{mapping.longUrl}}">{{mapping.longUrl}}</a>
+            <a href="{{mapping.url}}">{{mapping.url}}</a>
           </td>
           <td>
-            {{mapping.lastHour}}
+            {{mapping.statistic.lastHour}}
           </td>
           <td>
-            {{mapping.lastDay}}
+            {{mapping.statistic.last24Hours}}
           </td>
           <td>
-            {{mapping.lastMonth}}
+            {{mapping.statistic.last7Days}}
           </td>
           <td>
-            {{mapping.total}}
+            {{mapping.statistic.total}}
           </td>
           <td>
-            <input type="button" value="X" ng-click="$ctrl.deleteMapping(mapping.shortUrl)">
+            <input type="button" value="X" ng-click="$ctrl.deleteMapping(mapping.tiny)">
           </td>
         </tr>
         </tbody>

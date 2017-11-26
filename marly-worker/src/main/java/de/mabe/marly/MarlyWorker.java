@@ -58,22 +58,22 @@ public class MarlyWorker {
     log = Log.getLogger("Marly-Worker:" + port);
 
     get("/", (req, res) -> redirect(res, SERVICE_URL));
-    get("/info", (req, res) -> infoFactory.getInfoJson(active, lastUpdate));
-    get("/:short", (req, res) -> performMarlyRedirect(res, req.params("short")));
+    get("/info", (req, res) -> infoFactory.getInfoJson(active, redirects.size(), lastUpdate));
+    get("/:tiny", (req, res) -> performMarlyRedirect(res, req.params("tiny")));
   }
 
-  private Void performMarlyRedirect(Response res, String shortUrl) {
+  private Void performMarlyRedirect(Response res, String tiny) {
     if (!active) {
       res.status(500);
     } else {
-      String longUrl = redirects.get(shortUrl);
+      String url = redirects.get(tiny);
 
-      if (longUrl == null) {
+      if (url == null) {
         res.status(404);
       } else {
-        log.info("::: " + shortUrl + " -> " + longUrl);
-        redirectEventThrower.throwUrlCalledEvent(shortUrl);
-        res.redirect(longUrl);
+        log.info("::: " + tiny + " -> " + url);
+        redirectEventThrower.throwUrlCalledEvent(tiny);
+        res.redirect(url);
       }
     }
     return null;

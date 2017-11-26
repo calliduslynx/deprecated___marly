@@ -23,9 +23,18 @@
     };
 
     var loadMappingDetails = function () {
+      if (vm.userdetails === null)
+        return;
+
       $http.get("/mappings").then(function (response) {
-        if (response.data)
+        if (response.data) {
           vm.mappingdetails = response.data;
+          vm.mappingdetails.forEach(function (details) {
+            $http.get("/statistic/" + details.tiny).then(function (result) {
+              details.statistic = result.data;
+            });
+          });
+        }
       });
     };
 
@@ -40,14 +49,17 @@
       });
     };
 
-    vm.deleteMapping = function (shortUrl) {
-      $http.delete("/mappings/" + shortUrl).then(function () {
+    vm.deleteMapping = function (tiny) {
+      $http.delete("/mappings/" + tiny).then(function () {
         loadMappingDetails();
       });
     };
 
     loadUserDetails();
-    // FIXME: automatic reload
-    // FIXME: delete
+
+    setInterval(function () {
+      loadMappingDetails()
+    }, 1500);
+
   });
 })();

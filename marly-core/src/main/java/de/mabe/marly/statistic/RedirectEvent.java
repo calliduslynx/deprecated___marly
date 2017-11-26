@@ -4,6 +4,8 @@ import de.mabe.marly.mapping.Mapping;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -43,6 +45,10 @@ public class RedirectEvent {
 
   @Repository
   public interface Repo extends JpaRepository<RedirectEvent, Long> {
+    int countByMapping(Mapping mapping);
 
+    int countByMappingAndDateAfter(Mapping mapping, Date date);
+
+    List<RedirectEvent> findByMapping(Mapping mapping);
   }
 }
