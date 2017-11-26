@@ -8,19 +8,19 @@ import org.eclipse.jetty.util.log.Log;
 import org.eclipse.jetty.util.log.Logger;
 import com.mashape.unirest.http.Unirest;
 
-public class RedirectResolver {
-  static Logger log = Log.getLogger(RedirectResolver.class);
+public class MappingResolver {
+  static Logger log = Log.getLogger(MappingResolver.class);
 
 
-  private final String redirectResolveUrl;
+  private final String mappingResolveUrl;
 
-  public RedirectResolver(String redirectResolveUrl) {
-    this.redirectResolveUrl = redirectResolveUrl;
+  public MappingResolver(String mappingResolveUrl) {
+    this.mappingResolveUrl = mappingResolveUrl;
   }
 
   public Map<String, String> resolve() {
     try {
-      String fixedString = Unirest.get(redirectResolveUrl).asString().getBody();
+      String fixedString = Unirest.get(mappingResolveUrl).asString().getBody();
       return Arrays
           .stream(fixedString.split("><"))
           .map(it -> it.split("<>"))

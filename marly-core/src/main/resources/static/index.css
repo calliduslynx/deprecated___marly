@@ -8,6 +8,10 @@ body {
     padding: 30px;
 }
 
+hr {
+    border: 1px solid lightblue;
+}
+
 img {
     height: 60px;
     width: 60px;

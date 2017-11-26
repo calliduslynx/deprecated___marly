@@ -35,7 +35,7 @@ public class MappingController {
   }
 
   /**
-   * returns mappings in a native format 'cause json is unnecessary verbose
+   * returns mapping infos for authenticated user or all if user is admin
    */
   @GetMapping("/mappings")
   public List<MappingInfo> getMappingsForUser(OAuth2User sessionUser) {
@@ -48,14 +48,12 @@ public class MappingController {
       mappings = mappingService.findByUser(user);
     }
 
-    return mappings.stream().map(mapping -> {
-      return new MappingInfo(
-          mapping.getTiny(),
-          mappingService.getTinyUrl(mapping.getTiny()),
-          mapping.getUrl(),
-          mapping.getUser().getEmail()
-      );
-    }).collect(toList());
+    return mappings.stream().map(mapping -> new MappingInfo(
+        mapping.getTiny(),
+        mappingService.getTinyUrl(mapping.getTiny()),
+        mapping.getUrl(),
+        mapping.getUser().getEmail()
+    )).collect(toList());
   }
 
   public static final class NewMappingModel {
@@ -70,8 +68,7 @@ public class MappingController {
   }
 
   @DeleteMapping("/mappings/{tiny}")
-  public ResponseEntity<Void> deleteMapping(OAuth2User user, @RequestBody @PathVariable("tiny") String tiny) {
-
+  public ResponseEntity<Void> deleteMapping(OAuth2User user, @PathVariable("tiny") String tiny) {
     Mapping mapping = mappingService.getMappingByTiny(tiny);
     if (mapping == null)
       return ResponseEntity.notFound().build();

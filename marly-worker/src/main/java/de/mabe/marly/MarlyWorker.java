@@ -34,10 +34,10 @@ public class MarlyWorker {
   private static final String MAPPING_RESOLVE_URL = "http://localhost:8080/intern/mappings";
 
   // ********************************************************************
-  // ***** Static
+  // ***** Members
   // ********************************************************************
   private final RedirectEventThrower redirectEventThrower = new RedirectEventThrower(REDIRECT_EVENT_URL);
-  private final RedirectResolver mappingResolver = new RedirectResolver(MAPPING_RESOLVE_URL);
+  private final MappingResolver mappingResolver = new MappingResolver(MAPPING_RESOLVE_URL);
   private final InfoFactory infoFactory = new InfoFactory();
 
   private volatile Map<String, String> redirects = Collections.emptyMap();
@@ -62,19 +62,20 @@ public class MarlyWorker {
     get("/:tiny", (req, res) -> performMarlyRedirect(res, req.params("tiny")));
   }
 
-  private Void performMarlyRedirect(Response res, String tiny) {
+  private Object performMarlyRedirect(Response res, String tiny) {
     if (!active) {
-      res.status(500);
-    } else {
-      String url = redirects.get(tiny);
+      res.status(424);
+      return "";
+    }
 
-      if (url == null) {
-        res.status(404);
-      } else {
-        log.info("::: " + tiny + " -> " + url);
-        redirectEventThrower.throwUrlCalledEvent(tiny);
-        res.redirect(url);
-      }
+    String url = redirects.get(tiny);
+
+    if (url == null) {
+      res.status(404);
+    } else {
+      log.info("::: " + tiny + " -> " + url);
+      redirectEventThrower.throwUrlCalledEvent(tiny);
+      res.redirect(url);
     }
     return null;
   }

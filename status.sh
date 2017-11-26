@@ -14,5 +14,5 @@ while [ 1 ] ; do
 	echo "Worker 9018 : "`curl -s http://localhost:9018/info` $? &
 	echo "Worker 9019 : "`curl -s http://localhost:9019/info` $? &
 	echo "Worker 9020 : "`curl -s http://localhost:9020/info` $? &
-	sleep 3
+	sleep 5
 done
